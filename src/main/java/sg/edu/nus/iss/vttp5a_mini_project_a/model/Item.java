@@ -25,7 +25,7 @@ public class Item implements Serializable {
 
     @NotNull(message = "Expiration date is required")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @FutureOrPresent(message = "Expiration date must be in the present or future")
+    @FutureOrPresent(message = "Expiration date must be in the future")
     private Date expiryDate;
 
     @NotEmpty(message = "Category is required")

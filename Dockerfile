@@ -1,4 +1,4 @@
-FROM eclipse-temurin:23-noble AS builder
+FROM eclipse-temurin:22-noble AS builder
 
 WORKDIR /src
 
@@ -13,7 +13,7 @@ COPY src src
 RUN chmod a+x mvnw && /src/mvnw package -Dmaven.test.skip=true
 
 # using jre as it does not have runtime, better security. no need for runtime as image already built above
-FROM eclipse-temurin:23-jre-noble
+FROM eclipse-temurin:22-jre-noble
 
 WORKDIR /app
 

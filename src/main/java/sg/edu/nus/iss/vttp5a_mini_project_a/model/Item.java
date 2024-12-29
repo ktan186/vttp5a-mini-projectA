@@ -42,7 +42,7 @@ public class Item implements Serializable {
     public Item(String id,
             @NotEmpty(message = "Item name is required") @Size(min = 1, max = 150, message = "Name should have between 1 and 150 characters") String name,
             @NotNull(message = "Item quantity is required") @Positive(message = "Item quantity must be greater than 0") int quantity,
-            @NotNull(message = "Expiration date is required") @FutureOrPresent(message = "Expiration date must be in the present or future") Date expiryDate,
+            @NotNull(message = "Expiration date is required") @FutureOrPresent(message = "Expiration date must be in the future") Date expiryDate,
             @NotEmpty(message = "Category is required") String category,
             @NotEmpty(message = "Storage location is required") String storage, String notes) {
         this.id = id;

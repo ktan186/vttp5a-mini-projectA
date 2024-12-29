@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Item</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/eb73a4201e.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/Background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+        /* Sidebar Menu */
+        .offcanvas .list-group-item a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .offcanvas .list-group-item a:hover {
+            color: #007bff;
+        }
+
+        .offcanvas .list-group-item:nth-child(5) a {
+            color: red; /* Logout button */
+            font-weight: bold;
+        }
+
+        .sidebar-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <br>
+        <!-- Sidebar Menu -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h6 class="list-group" th:text="${user}"></h6>
+                <br>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/inventory" class="text-decoration-none">Inventory</a></li>
+                    <li class="list-group-item"><a href="/inventory/suggestions" class="text-decoration-none">Recipe Suggestions</a></li>
+                    <li class="list-group-item"><a href="/inventory/savedRecipes" class="text-decoration-none">Saved Recipes</a></li>
+                    <li class="list-group-item"><a href="/inventory/badges" class="text-decoration-none">Badges</a></li>
+                    <li class="list-group-item"><a href="/logout" class="text-decoration-none">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Sidebar Toggle Button -->
+        <div class="sidebar-button">
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="fas fa-bars"></i> Menu
+            </button>
+        </div>
+
+        <form method="POST" th:action="@{/inventory/add}" th:object="${item}">
+            <br><br>
+            <h2>Add New Item</h2>
+            <br><br>
+            <input type="hidden" name="id" th:field="*{id}">
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Item Name</label>
+                <input type="text" class="form-control" name="name" th:field="*{name}" placeholder="Item Name">
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Quantity</label>
+                <input type="number" class="form-control" name="quantity" th:field="*{quantity}" placeholder="Quantity">
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}"></div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Expiration Date</label>
+                <input type="date" class="form-control" name="expiryDate" th:field="*{expiryDate}" placeholder="Expiration Date">
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}"></div>
+            <!-- <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Category</label>
+                <input type="text" class="form-control" name="category" th:field="*{category}" placeholder="Category">
+            </div> -->
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label><br>
+                <select name="category" id="category" th:field="*{category}">
+                    <option value="" th:selected="${item.category == null}">Select Category</option>
+                    <option value="Meat & Seafood">Meat & Seafood</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Dry Goods">Dry Goods</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Beverages">Beverages</option>
+                    <option value="Sauces">Sauces</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+            <!-- <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Storage</label>
+                <input type="text" class="form-control" name="storage" th:field="*{storage}" placeholder="Storage">
+            </div> -->
+            <div class="mb-3">
+                <label for="storage" class="form-label">Storage</label><br>
+                <select name="storage" id="storage" th:field="*{storage}">
+                    <option value="" th:selected="${item.storage == null}">Select Storage</option>
+                    <option value="Refrigerator">Refrigerator</option>
+                    <option value="Freezer">Freezer</option>
+                    <option value="Pantry">Pantry</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('storage')}" th:errors="*{storage}"></div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Notes</label>
+                <input type="text" class="form-control" name="notes" th:field="*{notes}" placeholder="Notes">
+            </div>
+            <div class ="alert alert-danger" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></div>
+
+            <div th:if="${error != null}">
+                <p style="color: red;" th:text="${error}"></p>
+                <div>
+                    <h5>Duplicate Items</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Quantity</th>
+                                <th>Expiration Date</th>
+                                <th>Category</th>
+                                <th>Storage</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="duplicateItem : ${duplicateItems}">
+                                <td th:utext="${duplicateItem.name}"></td>
+                                <td th:utext="${duplicateItem.quantity}"></td>
+                                <td th:utext="${#dates.format(duplicateItem.expiryDate, 'EEE, dd/MM/yyyy')}"></td>
+                                <td th:utext="${duplicateItem.category}"></td>
+                                <td th:utext="${duplicateItem.storage}"></td>
+                                <td th:utext="${duplicateItem.notes}"></td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm" th:href="@{/inventory/update/{item-id}(item-id=${duplicateItem.id})}">Update</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <input type="hidden" name="duplicate" value="true">
+            </div>
+
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

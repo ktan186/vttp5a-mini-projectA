@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/eb73a4201e.js" crossorigin="anonymous"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/Background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        .recipe-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #08080c;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    
+        .recipe-image {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 30px;
+            color: #3b5998;
+            text-align: center;
+        }
+    
+        .ingredient-list li,
+        .step-list li {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+    
+        .list-group-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Sidebar Menu */
+        .offcanvas .list-group-item a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .offcanvas .list-group-item a:hover {
+            color: #007bff;
+        }
+
+        .offcanvas .list-group-item:nth-child(5) a {
+            color: red; /* Logout button */
+            font-weight: bold;
+        }
+
+        .sidebar-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <br>
+    <div class="container recipe-container">
+        <!-- Sidebar Menu -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h6 class="list-group" th:text="${user}"></h6>
+                <br>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/inventory" class="text-decoration-none">Inventory</a></li>
+                    <li class="list-group-item"><a href="/inventory/suggestions" class="text-decoration-none">Recipe Suggestions</a></li>
+                    <li class="list-group-item"><a href="/inventory/savedRecipes" class="text-decoration-none">Saved Recipes</a></li>
+                    <li class="list-group-item"><a href="/inventory/badges" class="text-decoration-none">Badges</a></li>
+                    <li class="list-group-item"><a href="/logout" class="text-decoration-none">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Sidebar Toggle Button -->
+        <div class="sidebar-button">
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="fas fa-bars"></i> Menu
+            </button>
+        </div>
+
+        <br><br>
+        <!-- Recipe Title -->
+        <h1 class="recipe-title" th:text="${recipe.title}"></h1>
+    
+        <form th:action="@{/inventory/saveRecipe}" method="POST">
+            <input type="hidden" name="recipeId" th:value="${recipe.id}" />
+            <button type="submit" class="btn btn-success">Save Recipe</button>
+        </form>
+        
+        <!-- Recipe Image -->
+        <div class="text-center my-4">
+            <img class="recipe-image" th:src="${recipe.image}" th:alt="${recipe.title}">
+        </div>
+    
+        <!-- Summary -->
+        <p class="text-center" th:utext="${recipe.summary}"></p>
+
+        <!-- Ingredients -->
+        <h5 class="section-title">Ingredients</h5>
+        <ul class="list-group ingredient-list">
+            <li class="list-group-item d-flex align-items-center" th:each="ingredient : ${recipe.extendedIngredients}">
+                <input type="checkbox" class="form-check-input me-2">
+                <span th:text="${ingredient}" class="ingredient-text"></span>
+            </li>
+        </ul>
+    
+        <!-- Instructions -->
+        <h5 class="section-title">Instructions</h5>
+        <ol class="list-group step-list">
+            <li class="list-group-item" th:each="step, iterStat : ${recipe.step}" th:text="${iterStat.index + 1} + '. ' + ${step}"></li>
+        </ol>
+    
+        <!-- Source URL -->
+        <div class="text-center mt-4">
+            <a class="btn btn-primary" th:href="${recipe.sourceUrl}" target="_blank">View Full Recipe</a>
+        </div>
+
+        <!-- Nutrition and Taste -->
+        <div class="row mt-4">
+            <div class="col-md-6 text-center">
+                <h5 class="section-title">Nutrition Information</h5>
+                <iframe th:src="${recipe.nutrition}" width="100%" height="600px" style="border:none;"></iframe>
+                <!-- <img th:if="${recipe.nutrition != null}" th:src="${recipe.nutrition}" alt="Nutrition" class="img-fluid"> -->
+            </div>
+            <div class="col-md-6 text-center">
+                <h5 class="section-title">Taste Profile</h5>
+                <img th:if="${recipe.taste != null}" th:src="${recipe.taste}" alt="Taste Profile" class="img-fluid">
+            </div>
+        </div>
+    </div>
+
+    <br>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory List</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/eb73a4201e.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/Background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+        /* Sidebar Menu */
+        .offcanvas .list-group-item a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .offcanvas .list-group-item a:hover {
+            color: #007bff;
+        }
+
+        .offcanvas .list-group-item:nth-child(5) a {
+            color: red; /* Logout button */
+            font-weight: bold;
+        }
+        .sidebar-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1000;
+        }
+        .expired {
+            background-color: #f4b1b6; /* Light red for expired items */
+        }
+        .table tbody td {
+            vertical-align: middle;
+        }
+        
+        .recipe-card {
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+        .recipe-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .recipe-card-body {
+            padding: 15px;
+        }
+        .recipe-card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #3b5e6f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Menu -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h6 class="list-group" th:text="${user}"></h6>
+                <br>
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="/inventory" class="text-decoration-none">Inventory</a></li>
+                    <li class="list-group-item"><a href="/inventory/suggestions" class="text-decoration-none">Recipe Suggestions</a></li>
+                    <li class="list-group-item"><a href="/inventory/savedRecipes" class="text-decoration-none">Saved Recipes</a></li>
+                    <li class="list-group-item"><a href="/inventory/badges" class="text-decoration-none">Badges</a></li>
+                    <li class="list-group-item"><a href="/logout" class="text-decoration-none">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Sidebar Toggle Button -->
+        <div class="sidebar-button">
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="fas fa-bars"></i> Menu
+            </button>
+        </div>
+
+        <br><br>
+        <h1 class="my-4">Welcome <span th:text="${user}"></span>!</h1>
+
+        <h2>Inventory List</h2>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <a class="btn btn-outline-success btn-sm" th:href="@{/inventory/add}">Add Item</a>
+
+            <form method="GET" action="">
+                <div class="row g-3 align-items-center mb-3">
+                    <!-- Category Filter -->
+                    <div class="col-auto">
+                        <label for="categoryFilter" class="form-label">Filter by Category</label>
+                        <select id="categoryFilter" name="categoryFilter" class="form-select">
+                            <option value="" th:selected="${categoryFilter == null || categoryFilter.isEmpty()}">All</option>
+                            <option value="Meat & Seafood" th:selected="${categoryFilter == 'Meat & Seafood'}">Meat & Seafood</option>
+                            <option value="Vegetables" th:selected="${categoryFilter == 'Vegetables'}">Vegetables</option>
+                            <option value="Dry Goods" th:selected="${categoryFilter == 'Dry Goods'}">Dry Goods</option>
+                            <option value="Dairy" th:selected="${categoryFilter == 'Dairy'}">Dairy</option>
+                            <option value="Fruits" th:selected="${categoryFilter == 'Fruits'}">Fruits</option>
+                            <option value="Beverages" th:selected="${categoryFilter == 'Beverages'}">Beverages</option>
+                            <option value="Sauces" th:selected="${categoryFilter == 'Sauces'}">Sauces</option>
+                            <option value="Others" th:selected="${categoryFilter == 'Others'}">Others</option>
+                        </select>
+                    </div>
+                    <!-- Storage Filter -->
+                    <div class="col-auto">
+                        <label for="storageFilter" class="form-label">Filter by Storage</label>
+                        <select id="storageFilter" name="storageFilter" class="form-select">
+                            <option value="" th:selected="${storageFilter == null || storageFilter.isEmpty()}">All</option>
+                            <option value="Refrigerator" th:selected="${storageFilter == 'Refrigerator'}">Refrigerator</option>
+                            <option value="Freezer" th:selected="${storageFilter == 'Freezer'}">Freezer</option>
+                            <option value="Pantry" th:selected="${storageFilter == 'Pantry'}">Pantry</option>
+                            <option value="Others" th:selected="${storageFilter == 'Others'}">Others</option>
+                        </select>
+                    </div>
+        
+                    <!-- Submit Button -->
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-outline-primary mt-4">Apply Filters</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <!-- <th>ID</th> -->
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Expiration Date</th>
+                    <th>Category</th>
+                    <th>Storage</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+                
+            </thead>
+            <tbody>
+                <tr th:each="i: ${items}" th:classappend="${T(java.time.LocalDateTime).ofInstant(i.expiryDate.toInstant(), T(java.time.ZoneId).systemDefault()).toLocalDate().isBefore(T(java.time.LocalDate).now())} ? 'expired' : ''">
+                    <!-- <td th:utext="${i.id}"></td> -->
+                    <td th:utext="${i.name}"></td>
+                    <td>
+                        <form th:action="@{/inventory/update/quantity/{item-id}(item-id=${i.id})}" method="POST" style="display: inline;">
+                            <button type="submit" name="quantity" value="-1" class="btn btn-outline-secondary btn-sm">-</button>
+                        </form>
+                        <span th:text="${i.quantity}"></span>
+                        <form th:action="@{/inventory/update/quantity/{item-id}(item-id=${i.id})}" method="POST" style="display: inline;">
+                            <button type="submit" name="quantity" value="1" class="btn btn-outline-secondary btn-sm">+</button>
+                        </form>
+                    </td>
+                    <td th:utext="${#dates.format(i.expiryDate, 'EEE, dd/MM/yyyy')}"></td>
+                    <td th:utext="${i.category}"></td>
+                    <td th:utext="${i.storage}"></td>
+                    <td th:utext="${i.notes}"></td>
+                    <td>
+                        <a class="btn btn-outline-danger btn-sm" th:href="@{/inventory/delete/{item-id}(item-id=${i.id})}">Delete</a>
+                        <a class="btn btn-outline-success btn-sm" th:href="@{/inventory/update/{item-id}(item-id=${i.id})}">Update</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br><br>
+
+        <h2>Recipe Suggestions</h2>
+        <br>
+        <div class="row">
+            <div th:if="${error != null}">
+                <p style="color: red;" th:text="${error}"></p>
+            </div>
+            <div class="col-md-4" th:each="recipe : ${recipes}">
+                <div class="recipe-card">
+                    <img th:src="${recipe.image}" th:alt="${recipe.title}">
+                    <div class="recipe-card-body">
+                        <h5 class="recipe-card-title" th:text="${recipe.title}"></h5>
+                        <p class="card-text">Ingredients you have: <span th:text="${recipe.usedIngredientCount}"></span></p>
+                        <ul>
+                            <li th:each="used : ${recipe.usedIngredients}" th:utext="${used}"></li>
+                        </ul>
+                        <p class="card-text">Ingredients to buy: <span th:text="${recipe.missedIngredientCount}"></span></p>
+                        <ul>
+                            <li th:each="missed : ${recipe.missedIngredients}" th:utext="${missed}"></li>
+                        </ul>
+                        <a th:href="@{/inventory/detailedRecipe/{id}(id=${recipe.id})}" class="btn btn-outline-primary">View Recipe</a>
+                        <form th:action="@{/inventory/saveRecipe}" method="POST" style="display:inline;">
+                            <input type="hidden" name="recipeId" th:value="${recipe.id}" />
+                            <button type="submit" class="btn btn-outline-success">Save Recipe</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <a th:href="@{/inventory/suggestions}" class="btn btn-outline-primary">View More Recipes</a>
+        </div>
+
+        <br><br>
+        <h2>Food Storage & Waste Reduction Tip</h2>
+        <br>
+        <div>
+            <div>
+                <img th:src="@{'/' + ${randomTip}}" alt="Tip" class="img-fluid" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+    <br>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
